@@ -19,7 +19,7 @@ public class Lotto {
 
     private List<Integer> numbers = new ArrayList<>();
 
-    public static int getTicketCount(int purchaseAmount){
+    public static int getTicketCount(int purchaseAmount) {
         return purchaseAmount / LOTTO_PRICE;
     }
 
