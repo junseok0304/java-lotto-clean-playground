@@ -1,34 +1,38 @@
 package controller;
 
+import java.util.stream.Collectors;
 import model.Lotto;
 import view.InputView;
 import view.ResultView;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class LottoController {
 
     public void run() {
-        int purchaseAmount = InputView.getPurchaseAmount();
+        int purchaseAmount;
+        int ticketCount;
 
-        int ticketCount = Lotto.getTicketCount(purchaseAmount);
+        do {
+            purchaseAmount = InputView.getPurchaseAmount();
+            ticketCount = Lotto.getTicketCount(purchaseAmount);
+            if (ticketCount == -1) {
+                ResultView.printInvalidAmountMessage();
+            }
+        } while (ticketCount == -1);
 
         List<Lotto> tickets = Lotto.generateLottoTickets(ticketCount);
 
         ResultView.printOrderTickets(ticketCount);
-        ResultView.printTickets(ticketCount, formatTickets(tickets));
+        ResultView.printTickets(formatTickets(tickets));
     }
 
-    public List<String> formatTickets(List<Lotto> tickets) {
-        List<String> formattedTickets = tickets.stream()
+    private List<String> formatTickets(List<Lotto> tickets) {
+        return tickets.stream()
                 .map(lotto -> lotto.getNumbers()
                         .stream()
-                        .sorted()
                         .map(String::valueOf)
-                        .collect(Collectors.joining(",","[","]")))
+                        .collect(Collectors.joining(", ", "[", "]")))
                 .toList();
-
-        return formattedTickets;
     }
 }
