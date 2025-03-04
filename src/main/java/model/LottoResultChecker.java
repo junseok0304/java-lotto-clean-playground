@@ -11,9 +11,7 @@ public class LottoResultChecker {
         Set<Integer> winningSet = new HashSet<>(winningNumbers);
 
         for (Lotto lotto : purchasedLottos) {
-            int matchCount = getMatchCount(lotto, winningSet);
-            boolean hasBonus = hasBonusMatch(lotto, bonusNumber);
-            totalPrize += updateResults(result, matchCount, hasBonus);
+            totalPrize += updateResults(result, lotto, winningSet, bonusNumber);
         }
 
         result.put("totalPrize", totalPrize);
@@ -23,22 +21,15 @@ public class LottoResultChecker {
     private static Map<String, Integer> initializeResultMap() {
         Map<String, Integer> result = new LinkedHashMap<>();
         for (WinningRank rank : WinningRank.values()) {
-            if (rank != WinningRank.NO_MATCH) {
-                result.put(rank.getDescription(), 0); // 🛠️ 당첨 개수 0으로 초기화
-            }
+            result.put(rank.getDescription(), 0);
         }
         return result;
     }
 
-    private static int getMatchCount(Lotto lotto, Set<Integer> winningSet) {
-        return (int) lotto.getNumbers().stream().filter(winningSet::contains).count();
-    }
+    private static int updateResults(Map<String, Integer> result, Lotto lotto, Set<Integer> winningSet, int bonusNumber) {
+        int matchCount = (int) lotto.getNumbers().stream().filter(winningSet::contains).count();
+        boolean hasBonus = lotto.getNumbers().contains(bonusNumber);
 
-    private static boolean hasBonusMatch(Lotto lotto, int bonusNumber) {
-        return lotto.getNumbers().contains(bonusNumber);
-    }
-
-    private static int updateResults(Map<String, Integer> result, int matchCount, boolean hasBonus) {
         Optional<WinningRank> rank = WinningRank.findByMatchCount(matchCount, hasBonus);
         if (rank.isEmpty()) {
             return 0;
@@ -46,7 +37,6 @@ public class LottoResultChecker {
 
         WinningRank winningRank = rank.get();
         String key = winningRank.getDescription();
-
         result.put(key, result.getOrDefault(key, 0) + 1);
 
         return winningRank.getPrize();
