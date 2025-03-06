@@ -1,41 +1,50 @@
 package model;
 
-import config.LottoConstants;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Lotto {
+
+    public static final int LOTTO_MIN_NUMBER = 1;
+    public static final int LOTTO_MAX_NUMBER = 45;
+    public static final int LOTTO_CREATE_SIZE = 6;
+    public static final int LOTTO_PRICE = 1000;
+    public static final List<Integer> LOTTO_NUMBER_POOL =
+            IntStream.rangeClosed(LOTTO_MIN_NUMBER, LOTTO_MAX_NUMBER)
+                    .boxed()
+                    .collect(Collectors.toList());
+
     private final List<Integer> numbers;
 
-    public Lotto(List<Integer> numbers) {
-        validateNumbers(numbers);
-        this.numbers = new ArrayList<>(numbers);
-        Collections.sort(this.numbers);
+    public Lotto() {
+        this.numbers = createLottoNumbers();
     }
 
-    private void validateNumbers(List<Integer> numbers) {
-        if (numbers.size() != LottoConstants.LOTTO_SIZE.getValue()) {
-            throw new IllegalArgumentException("로또 번호는 6개여야 합니다.");
+    public static int getTicketCount(int purchaseAmount) {
+        if (purchaseAmount % LOTTO_PRICE != 0) {
+            return -1;
         }
-        if (new HashSet<>(numbers).size() != LottoConstants.LOTTO_SIZE.getValue()) {
-            throw new IllegalArgumentException("로또 번호는 중복될 수 없습니다.");
+        return purchaseAmount / LOTTO_PRICE;
+    }
+
+    private List<Integer> createLottoNumbers() {
+        List<Integer> shuffledNumbers = new ArrayList<>(LOTTO_NUMBER_POOL);
+        Collections.shuffle(shuffledNumbers);
+        return shuffledNumbers.subList(0, LOTTO_CREATE_SIZE);
+    }
+
+    public static List<Lotto> generateLottoTickets(int ticketCount) {
+        List<Lotto> tickets = new ArrayList<>();
+        for (int i = 0; i < ticketCount; i++) {
+            tickets.add(new Lotto());
         }
-        for (int number : numbers) {
-            if (number < LottoConstants.MIN_NUMBER.getValue() || number > LottoConstants.MAX_NUMBER.getValue()) {
-                throw new IllegalArgumentException("로또 번호는 1~45 사이여야 합니다.");
-            }
-        }
+        return tickets;
     }
 
     public List<Integer> getNumbers() {
-        return new ArrayList<>(numbers);
-    }
-
-    @Override
-    public String toString() {
-        return numbers.toString();
+        List<Integer> sortedNumbers = new ArrayList<>(numbers);
+        Collections.sort(sortedNumbers);
+        return sortedNumbers;
     }
 }

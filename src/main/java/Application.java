@@ -1,9 +1,9 @@
-import controller.LottoMachineController;
+import controller.LottoController;
 
 public class Application {
 
     public static void main(String[] args) {
-        LottoMachineController lottoMachine = new LottoMachineController();
-        lottoMachine.run();
+        LottoController lottoController = new LottoController();
+        lottoController.run();
     }
 }
